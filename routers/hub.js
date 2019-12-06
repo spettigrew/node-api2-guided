@@ -1,18 +1,25 @@
-const express = require ("express")
-const hubRouter = require("../hubs/hubs-model.js")
+const express = require("express")
+const messageRouter = require("./message")
+const hubs = require("../hubs/hubs-model.js")
 
+// Creates a new router, or "sub-application" within our app
+// Routers can have their own endpoints, middleware, etc.
 const router = express.Router()
 
+// We can nest routers within routers, as deep as we want
+router.use("/:id/messages", messageRouter)
+
+// The endpoint is built off of the parent router's endpoint.
+// So this endpoint is accessed at /api/hubs/:id
 router.get("/", (req, res) => {
-    hubs.find()
-    // console.log(req.query)
-    // console.log(req.query.hello)
     const opts = {
+        // These values all comes from the URL's query string
+        // (everything after the question mark)
         limit: req.query.limit,
         sortby: req.query.sortby,
-        sortdir: req.query.sortdir
+        sortdir: req.query.sortdir,
     }
-    // query is case sensitive
+
     hubs.find(opts)
         .then(hubs => {
             res.status(200).json(hubs)
